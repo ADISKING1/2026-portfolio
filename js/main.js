@@ -759,7 +759,7 @@
     let W = 0, H = 0;
     let particles = [];
     let colors = { ink: "#ece8df", accent };
-    let running = false, visible = true, rafId = null;
+    let running = false, visible = true, rafId = null, lastT = 0;
     const pointer = { x: -9999, y: -9999, last: 0 };
 
     function cssVar(name) {
@@ -836,6 +836,11 @@
     function step() {
       ctx.clearRect(0, 0, W, H);
       const now = performance.now();
+      /* time-normalized physics: consistent speed at 30, 60 or 120Hz,
+         and catch-up (capped for stability) when frames are throttled */
+      const dt = lastT ? Math.min((now - lastT) / 16.7, 3) : 1;
+      lastT = now;
+      const damp = Math.pow(0.86, dt);
       const influence = Math.max(0, 1 - (now - pointer.last) / 700);
       const R = 110;
 
@@ -855,10 +860,10 @@
             ay += (dy / d) * f;
           }
         }
-        p.vx = (p.vx + ax) * 0.86;
-        p.vy = (p.vy + ay) * 0.86;
-        p.x += p.vx;
-        p.y += p.vy;
+        p.vx = (p.vx + ax * dt) * damp;
+        p.vy = (p.vy + ay * dt) * damp;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
         if (p.accent) accentBatch.push(p);
         else ctx.fillRect(p.x, p.y, 2, 2);
       }
@@ -872,6 +877,7 @@
     function start() {
       if (!rafId) {
         running = true;
+        lastT = 0; // avoid a giant catch-up step after a pause
         rafId = requestAnimationFrame(step);
       }
     }
@@ -908,20 +914,24 @@
       if (!document.hidden) start();
     });
 
-    let lastW = window.innerWidth, lastH = window.innerHeight, resizeTimer;
-    window.addEventListener("resize", () => {
+    /* Rebuild when the hero's own box changes (panel drags, rotation,
+       emulated viewports). The hero is 100svh, so mobile browser-chrome
+       show/hide doesn't resize it and won't cause spurious rebuilds. */
+    let resizeTimer;
+    function onHeroResize() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        const dw = Math.abs(window.innerWidth - lastW);
-        const dh = Math.abs(window.innerHeight - lastH);
-        if (dw > 2 || dh > 150) {
-          lastW = window.innerWidth;
-          lastH = window.innerHeight;
+        if (Math.abs(heroEl.clientWidth - W) > 1 || Math.abs(heroEl.clientHeight - H) > 1) {
           build();
           start();
         }
       }, 200);
-    });
+    }
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(onHeroResize).observe(heroEl);
+    } else {
+      window.addEventListener("resize", onHeroResize);
+    }
 
     /* Wait for the display font so the sampled text matches the design */
     const boot = () => {

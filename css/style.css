@@ -56,6 +56,9 @@
 
 html {
   scroll-padding-top: calc(var(--bar-h) + 3rem);
+  /* keep rotated tapes/watermarks from enabling sideways panning on phones */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -77,6 +80,7 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  overflow-x: clip;
   transition: background 0.35s ease, color 0.35s ease;
 }
 
