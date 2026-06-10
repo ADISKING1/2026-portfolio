@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <meta name="description" content="Personal portfolio" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Ambient layers -->
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Custom cursor (desktop only) -->
+  <div class="cursor" aria-hidden="true">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+    <div class="cursor__label"></div>
+  </div>
+
+  <!-- Floating project preview card -->
+  <div class="peek" aria-hidden="true">
+    <div class="peek__cover"></div>
+    <p class="peek__desc"></p>
+  </div>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Everything below is rendered from config.js -->
+  <header id="bar-root"></header>
+  <div id="overlay-root"></div>
+  <main id="main"></main>
+  <footer id="footer-root"></footer>
+
+  <noscript>
+    <p style="max-width: 40rem; margin: 4rem auto; text-align: center; font-family: sans-serif">
+      This portfolio needs JavaScript to render its content from <code>config.js</code>.
+      Please enable JavaScript.
+    </p>
+  </noscript>
+
+  <script src="config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
